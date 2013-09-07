@@ -125,11 +125,19 @@ int main(int argc, char** argv) {
         return 6;
     }
 
-    struct selinux_opt seopts[] = {
-      { SELABEL_OPT_PATH, SELINUX_CONTEXTS_TMP }
-    };
+    if (access(SELINUX_CONTEXTS_TMP, R_OK) == 0) {
+        struct selinux_opt seopts[] = {
+          { SELABEL_OPT_PATH, SELINUX_CONTEXTS_TMP }
+        };
 
-    sehandle = selabel_open(SELABEL_CTX_FILE, seopts, 1);
+        sehandle = selabel_open(SELABEL_CTX_FILE, seopts, 1);
+    } else {
+        struct selinux_opt seopts[] = {
+          { SELABEL_OPT_PATH, "/file_contexts" }
+        };
+
+        sehandle = selabel_open(SELABEL_CTX_FILE, seopts, 1);
+    }
 
     if (!sehandle) {
         fprintf(stderr, "Warning:  No file_contexts\n");
